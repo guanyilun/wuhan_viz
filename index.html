@@ -15,6 +15,7 @@
 			<div class="changedata change_2" v-on:click="zs">致死率</div>
 			<div class="changedata change_3" v-on:click="zy">治愈率</div>
             <div class="changedata change_4" v-on:click="cw">确诊/万迁移人口</div>
+            <div class="changedata change_5" v-on:click="yy">医院数量</div>
 			<!-- 为ECharts准备一个具备大小（宽高）的Dom -->
 			<div id="main" style="width: 100%;height:100%;">
 			</div>
@@ -168,6 +169,14 @@
 							that.option.series[0].data = json;
 							myChart.setOption(that.option)
 						})
+					},
+					yy() {
+						var that = this;
+						var myChart = echarts.init(document.getElementById('main'));
+						$.get('data/hospital_echart.json', (json) => {
+							that.option.series[0].data = json;
+							myChart.setOption(that.option)
+						})
 					}
 				},
 				mounted() {
@@ -213,6 +222,9 @@
 		}
         .change_4 {
 			top: 240px;
+		}
+        .change_5 {
+			top: 300px;
 		}
 	</style>
 </html>
