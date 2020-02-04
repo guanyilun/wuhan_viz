@@ -2,7 +2,7 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
-		<title>武汉疫情分析</title>
+		<title>武汉疫情可视化</title>
 		<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 		<!-- 引入 echarts.js -->
 		<script src="js/echarts.min.js"></script>
@@ -14,6 +14,7 @@
 			<div class="changedata change_1" v-on:click="bl">确诊病例</div>
 			<div class="changedata change_2" v-on:click="zs">致死率</div>
 			<div class="changedata change_3" v-on:click="zy">治愈率</div>
+            <div class="changedata change_4" v-on:click="cw">确诊/万迁移人口</div>
 			<!-- 为ECharts准备一个具备大小（宽高）的Dom -->
 			<div id="main" style="width: 100%;height:100%;">
 			</div>
@@ -159,6 +160,14 @@
 							that.option.series[0].data = json;
 							myChart.setOption(that.option)
 						})
+					},
+					cw() {
+						var that = this;
+						var myChart = echarts.init(document.getElementById('main'));
+						$.get('data/confirm_per_10000_echart.json', (json) => {
+							that.option.series[0].data = json;
+							myChart.setOption(that.option)
+						})
 					}
 				},
 				mounted() {
@@ -173,8 +182,6 @@
 						that.option.series[1].data = json;
 						myChart.setOption(that.option)
 					})
-
-
 					// // 使用刚指定的配置项和数据显示图表。
 					// myChart.setOption(this.option);
 				}
@@ -190,28 +197,22 @@
 			border-radius: 4px;
 			text-align: center;
 			line-height: 40px;
-			color: dimgrey;
+            background-color: black;
+            color: whitesmoke;
+            left: 30px;
+            cursor: pointer;
 		}
-
 		.change_1 {
-			background-color: black;
-			color: whitesmoke;
-			left: 30px;
 			top: 60px;
 		}
-
 		.change_2 {
-			background-color: black;
-			color: whitesmoke;
-			left: 30px;
 			top: 120px;
 		}
-
 		.change_3 {
-			background-color: black;
-			color: whitesmoke;
-			left: 30px;
 			top: 180px;
+		}
+        .change_4 {
+			top: 240px;
 		}
 	</style>
 </html>
