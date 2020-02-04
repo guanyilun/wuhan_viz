@@ -1,125 +1,208 @@
 <html>
-<head>
-    <meta charset="utf-8">
-    <title>ECharts</title>
-    <!-- 引入 echarts.js -->
-    <script src="js/echarts.min.js"></script>
-    <script src="js/jquery.min.js"></script>
-    <script src="js/china.js"></script>
-</head>
-<body style="margin: 0px;">
-    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
-    <div id="main" style="width: 100%;height:100%;"></div>
-    <script type="text/javascript">
-      $.get('data/cities_echart.json', (json) => {option.series[0].data = json; myChart.setOption(option)})
-      $.get('data/moves_echart.json', (json) => {option.series[1].data = json; myChart.setOption(option)})
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+		<title>武汉疫情分析</title>
+		<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+		<!-- 引入 echarts.js -->
+		<script src="js/echarts.min.js"></script>
+		<script src="js/jquery.min.js"></script>
+		<script src="js/china.js"></script>
+	</head>
+	<body style="margin: 0px;">
+		<div id="app" style="width: 100%;height:100%;">
+			<div class="changedata change_1" v-on:click="bl">病例</div>
+			<div class="changedata change_2" v-on:click="zs">致死率</div>
+			<!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+			<div id="main" style="width: 100%;height:100%;">
+			</div>
+		</div>
+		<script type="text/javascript">
+			window.onload = function() {
+				document.addEventListener('touchstart', function(event) {
+					if (event.touches.length > 1) {
+						event.preventDefault()
+					}
+				})
+				document.addEventListener('gesturestart', function(event) {
+					event.preventDefault()
+				})
+			}
+			var vm = new Vue({
+				el: '#app',
+				data: {
+					option: {
+						backgroundColor: '#404a59',
+						title: {
+							text: '确诊病例与武汉人口迁移',
+							left: 'center',
+							textStyle: {
+								color: '#fff'
+							}
+						},
+						tooltip: {
+							trigger: 'item',
+							formatter: function(params, ticket, callback) {
+								if (params.seriesType == "effectScatter") {
+									return params.data.name + ": " + params.data.value[2];
+								} else if (params.seriesType == "lines") {
+									return params.data.fromName + " -> " + params.data.toName + ": " + params.data.value;
+								} else {
+									return params.name;
+								}
+							}
+						},
+						legend: {
+							show: false,
+							orient: 'vertical',
+							top: 'bottom',
+							left: 'right',
+							data: ['地点', '线路'],
+							textStyle: {
+								color: '#fff'
+							}
+						},
+						geo: {
+							map: 'china',
+							label: {
+								emphasis: {
+									show: false
+								}
+							},
+							roam: true,
+							itemStyle: {
+								normal: {
+									areaColor: '#323c48',
+									borderColor: '#404a59'
+								},
+								emphasis: {
+									areaColor: '#2a333d'
+								}
+							}
+						},
+						series: [{
+							name: '地点',
+							type: 'effectScatter',
+							coordinateSystem: 'geo',
+							zlevel: 2,
+							rippleEffect: {
+								brushType: 'stroke'
+							},
+							label: {
+								normal: {
+									show: true,
+									position: 'right',
+									formatter: '{b}'
+								},
+							},
+							symbolSize: 2,
+							showEffectOn: 'render',
+							itemStyle: {
+								normal: {
+									color: '#46bee9'
+								}
+							},
+							data: []
+						}, {
+							name: '线路',
+							type: 'lines',
+							coordinateSystem: 'geo',
+							zlevel: 2,
+							large: true,
+							effect: {
+								show: true,
+								constantSpeed: 30,
+								symbol: 'pin',
+								symbolSize: 3,
+								trailLength: 0,
+							},
+							lineStyle: {
+								normal: {
+									color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+										offset: 0,
+										color: '#58B3CC'
+									}, {
+										offset: 1,
+										color: '#F58158'
+									}], false),
+									width: 1,
+									opacity: 0.2,
+									curveness: 0.1
+								}
+							},
+							data: []
+						}],
+					}
+				},
+				methods: {
+					rk() {
+						var that = this;
+						var myChart = echarts.init(document.getElementById('main'));
+						$.get('data/cities_echart.json', (json) => {
+							that.option.series[0].data = json;
+							myChart.setOption(that.option)
+						})
+					},
+					bl() {
+						var that = this;
+						var myChart = echarts.init(document.getElementById('main'));
+						$.get('data/cases_echart.json', (json) => {
+							that.option.series[0].data = json;
+							myChart.setOption(that.option)
+						})
+					},
+					zs() {
+						var that = this;
+						var myChart = echarts.init(document.getElementById('main'));
+						$.get('data/fatality_echart.json', (json) => {
+							that.option.series[0].data = json;
+							myChart.setOption(that.option)
+						})
+					}
+				},
+				mounted() {
+					// 基于准备好的dom，初始化echarts实例
+					var myChart = echarts.init(document.getElementById('main'));
+					var that = this;
+					$.get('data/cases_echart.json', (json) => {
+						that.option.series[0].data = json;
+						myChart.setOption(that.option)
+					})
+					$.get('data/moves_echart.json', (json) => {
+						that.option.series[1].data = json;
+						myChart.setOption(that.option)
+					})
 
-      option = {
-          backgroundColor: '#404a59',
-          title: {
-              text: '确诊病例与武汉人口迁移',
-              left: 'center',
-              textStyle: {
-                  color: '#fff'
-              }
-          },
-          
-          tooltip: {
-              trigger: 'item',
-              formatter:function(params, ticket, callback){
-                  if(params.seriesType=="effectScatter") {
-                      return params.data.name+": "+params.data.value[2];
-                  } else if(params.seriesType=="lines"){
-                      return params.data.fromName+" -> " + params.data.toName + ": " + params.data.value;
-                  }else{
-                      return params.name;
-                  }
-              }
-          },
-          legend: {
-              show: false,
-              orient: 'vertical',
-              top: 'bottom',
-              left: 'right',
-              data: ['地点', '线路'],
-              textStyle: {
-                  color: '#fff'
-              }
-          },
-          geo: {
-              map: 'china',
-              label: {
-                  emphasis: {
-                      show: false
-                  }
-              },
-              roam: true,
-              itemStyle: {
-                  normal: {
-                      areaColor: '#323c48',
-                      borderColor: '#404a59'
-                  },
-                  emphasis: {
-                      areaColor: '#2a333d'
-                  }
-              }
-          },
-          series: [{
-              name: '地点',
-              type: 'effectScatter',
-              coordinateSystem: 'geo',
-              zlevel: 2,
-              rippleEffect: {
-                  brushType: 'stroke'
-              },
-              label: {
-                  normal: {
-                      show: true,
-                      position: 'right',
-                      formatter: '{b}'
-                  },
-              },
-              symbolSize: 2,
-              showEffectOn: 'render',
-              itemStyle: {
-                  normal: {
-                      color: '#46bee9'
-                  }
-              },
-              data: []
-          }, {
-              name: '线路',
-              type: 'lines',
-              coordinateSystem: 'geo',
-              zlevel: 2,
-              large: true,
-              effect: {
-                  show: true,
-                  constantSpeed: 30,
-                  symbol: 'pin',
-                  symbolSize: 3,
-                  trailLength: 0,
-              },
-              lineStyle: {
-                  normal: {
-                      color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
-                          offset: 0, color: '#58B3CC'
-                      }, {
-                          offset: 1, color: '#F58158'
-                      }], false),
-                      width: 1,
-                      opacity: 0.2,
-                      curveness: 0.1
-                  }
-              },
-              data: []
-          }]
-      };
-        // 基于准备好的dom，初始化echarts实例
-        var myChart = echarts.init(document.getElementById('main'));
 
-        // 使用刚指定的配置项和数据显示图表。
-        myChart.setOption(option);
-    </script>
-</body>
+					// // 使用刚指定的配置项和数据显示图表。
+					// myChart.setOption(this.option);
+				}
+			})
+		</script>
+	</body>
+	<style>
+		.changedata {
+			z-index: 999;
+			height: 40px;
+			width: 120px;
+			position: absolute;
+			border-radius: 4px;
+			text-align: center;
+			line-height: 40px;
+			color: dimgrey;
+		}
+
+		.change_1 {
+			background-color: coral;
+			left: 30px;
+			top: 60px;
+		}
+
+		.change_2 {
+			background-color: black;
+			color: whitesmoke;
+			left: 30px;
+			top: 120px;
+		}
+	</style>
 </html>
