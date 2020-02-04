@@ -11,8 +11,9 @@
 	</head>
 	<body style="margin: 0px;">
 		<div id="app" style="width: 100%;height:100%;">
-			<div class="changedata change_1" v-on:click="bl">病例</div>
+			<div class="changedata change_1" v-on:click="bl">确诊病例</div>
 			<div class="changedata change_2" v-on:click="zs">致死率</div>
+			<div class="changedata change_3" v-on:click="zy">治愈率</div>
 			<!-- 为ECharts准备一个具备大小（宽高）的Dom -->
 			<div id="main" style="width: 100%;height:100%;">
 			</div>
@@ -34,7 +35,7 @@
 					option: {
 						backgroundColor: '#404a59',
 						title: {
-							text: '确诊病例与武汉人口迁移',
+							text: '疫情与武汉人口迁移可视化',
 							left: 'center',
 							textStyle: {
 								color: '#fff'
@@ -135,14 +136,6 @@
 					}
 				},
 				methods: {
-					rk() {
-						var that = this;
-						var myChart = echarts.init(document.getElementById('main'));
-						$.get('data/cities_echart.json', (json) => {
-							that.option.series[0].data = json;
-							myChart.setOption(that.option)
-						})
-					},
 					bl() {
 						var that = this;
 						var myChart = echarts.init(document.getElementById('main'));
@@ -155,6 +148,14 @@
 						var that = this;
 						var myChart = echarts.init(document.getElementById('main'));
 						$.get('data/fatality_echart.json', (json) => {
+							that.option.series[0].data = json;
+							myChart.setOption(that.option)
+						})
+					},
+					zy() {
+						var that = this;
+						var myChart = echarts.init(document.getElementById('main'));
+						$.get('data/cure_echart.json', (json) => {
 							that.option.series[0].data = json;
 							myChart.setOption(that.option)
 						})
@@ -193,7 +194,8 @@
 		}
 
 		.change_1 {
-			background-color: coral;
+			background-color: black;
+			color: whitesmoke;
 			left: 30px;
 			top: 60px;
 		}
@@ -203,6 +205,13 @@
 			color: whitesmoke;
 			left: 30px;
 			top: 120px;
+		}
+
+		.change_3 {
+			background-color: black;
+			color: whitesmoke;
+			left: 30px;
+			top: 180px;
 		}
 	</style>
 </html>
