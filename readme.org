@@ -1,6 +1,8 @@
 * 武汉数据可视化
 网站: [[http://ncov.firslov.cn/]]
 
+[[./https://github.com/guanyilun/wuhan_viz/raw/master/assets/screenshot.png]]
+
 ** 数据来源
 - 迁移人口数据来源于百度迁徙, 武汉1月1日至1月26日总迁出人口比例
 - 确诊案例来自丁香园每日更新数据
