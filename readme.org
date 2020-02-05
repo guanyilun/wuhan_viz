@@ -1,5 +1,5 @@
 * 武汉数据可视化
-网站: [[http://ncov.firslov.cn/]]
+网站: [[http://ncov.firslov.cn/]] (数据每小时更新一次)
 
 [[https://raw.githubusercontent.com/guanyilun/wuhan_viz/master/assets/screenshot.png]]
 
@@ -13,3 +13,4 @@
 
 ** 鸣谢
 感谢[[https://github.com/wuhan2020/wuhan2020][wuhan2020]]团队的支持
+感谢@firslov的前端帮助
