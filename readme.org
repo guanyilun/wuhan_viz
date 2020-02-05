@@ -1,7 +1,8 @@
 * 武汉数据可视化
-网站: [[http://ncov.firslov.cn/]] (数据每小时更新一次)
+网站: [[http://ncov.firslov.cn/]] (数据每十分钟更新一次)
 
 [[https://raw.githubusercontent.com/guanyilun/wuhan_viz/master/assets/screenshot.png]]
+[[https://raw.githubusercontent.com/guanyilun/wuhan_viz/master/assets/screenshot_2.png]]
 
 ** 数据来源
 - 迁移人口数据来源于百度迁徙, 武汉1月1日至1月26日总迁出人口比例
@@ -13,4 +14,5 @@
 
 ** 鸣谢
 感谢[[https://github.com/wuhan2020/wuhan2020][wuhan2020]]团队的支持
-感谢@firslov的前端帮助
+
+感谢@firslov的前端帮助和提供服务器
