@@ -8,66 +8,19 @@
 		<script src="js/echarts.min.js"></script>
 		<script src="js/jquery.min.js"></script>
 		<script src="js/china.js"></script>
+		<link rel="icon" href="assets/favicon.ico">
+		<link rel="stylesheet" type="text/css" href="assets/style.css">
 	</head>
-	<style>
-		.changedata {
-			z-index: 999;
-			height: 40px;
-			width: 120px;
-			position: absolute;
-			border-radius: 5px;
-			text-align: center;
-			line-height: 40px;
-			background-color: black;
-			color: whitesmoke;
-			left: 25px;
-			cursor: pointer;
-			font-size: 12px;
-		}
-	
-		.change_1 {
-			top: 60px;
-		}
-	
-		.change_2 {
-			top: 120px;
-		}
-	
-		.change_3 {
-			top: 180px;
-		}
-	
-		.change_4 {
-			top: 240px;
-		}
-	
-		.change_5 {
-			top: 300px;
-		}
-		
-		.git_link {
-			bottom: 60px;
-			display: flex;
-			background-color: dimgray;
-			justify-content: center;
-			align-items: center;
-			text-align: center;
-			width: 90px;
-			height: 30px;
-			left: 40px;
-		}
-		.git_link img {
-			align-items: center;
-		}
-	</style>
 	<body style="margin: 0px;">
 		<div id="app" style="width: 100%;height:100%;">
-			<div class="changedata change_1" v-on:click="bl">确诊病例</div>
-			<div class="changedata change_2" v-on:click="zs">致死率</div>
-			<div class="changedata change_3" v-on:click="zy">治愈率</div>
-			<div class="changedata change_4" v-on:click="cw">确诊/万武汉迁入</div>
-			<div class="changedata change_5" v-on:click="yy">医院数量</div>
-			<div class="changedata git_link" onclick="window.open('https://github.com/guanyilun/wuhan_viz')"><img src="assets/git.png" style="height: 19px;width: 18px;">&nbsp;Github</div>
+			<div class="changedata change_1" id="bl" v-on:click="bl">确诊病例</div>
+			<div class="changedata change_2" id="zs" v-on:click="zs">致死率</div>
+			<div class="changedata change_3" id="zy" v-on:click="zy">治愈率</div>
+			<div class="changedata change_4" id="cw" v-on:click="cw">确诊/万武汉迁入</div>
+			<div class="changedata change_5" id="yy" v-on:click="yy">医院数量</div>
+			<div class="changedata live"><img src="assets/live.png" style="height: 12px;width: 12px;">&nbsp;&nbsp;Live / 10分钟</div>
+			<div class="changedata git_link" onclick="window.open('https://github.com/guanyilun/wuhan_viz')"><img src="assets/git.png"
+				 style="height: 18px;width: 18px;">&nbsp;Github</div>
 			<!-- 为ECharts准备一个具备大小（宽高）的Dom -->
 			<div id="main" style="width: 100%;height:100%;">
 			</div>
@@ -83,13 +36,15 @@
 					event.preventDefault()
 				})
 			}
+
 			var vm = new Vue({
 				el: '#app',
 				data: {
+					selected: "",
 					option: {
 						backgroundColor: '#404a59',
 						title: {
-							text: '疫情与武汉人口迁移可视化',
+							text: '',
 							left: 'center',
 							textStyle: {
 								color: '#fff'
@@ -119,6 +74,7 @@
 						},
 						geo: {
 							map: 'china',
+							zoom: 1.2,
 							label: {
 								emphasis: {
 									show: false
@@ -196,7 +152,14 @@
 						var myChart = echarts.init(document.getElementById('main'));
 						$.get('data/cases_echart.json', (json) => {
 							that.option.series[0].data = json;
-							myChart.setOption(that.option)
+							that.option.title.text = "确诊病例";
+							if (that.selected != "") {
+								that.selected.style.backgroundColor = "black";
+							}
+							that.selected = document.getElementById('bl')
+							that.selected.style.backgroundColor = "grey";
+							var opt = myChart.getOption();
+							that.show_part(myChart, opt);
 						})
 					},
 					zs() {
@@ -204,7 +167,14 @@
 						var myChart = echarts.init(document.getElementById('main'));
 						$.get('data/fatality_echart.json', (json) => {
 							that.option.series[0].data = json;
-							myChart.setOption(that.option)
+							that.option.title.text = "致死率";
+							if (that.selected != "") {
+								that.selected.style.backgroundColor = "black";
+							}
+							that.selected = document.getElementById('zs')
+							that.selected.style.backgroundColor = "grey";
+							var opt = myChart.getOption();
+							that.show_part(myChart, opt);
 						})
 					},
 					zy() {
@@ -212,7 +182,14 @@
 						var myChart = echarts.init(document.getElementById('main'));
 						$.get('data/cure_echart.json', (json) => {
 							that.option.series[0].data = json;
-							myChart.setOption(that.option)
+							that.option.title.text = "治愈率";
+							if (that.selected != "") {
+								that.selected.style.backgroundColor = "black";
+							}
+							that.selected = document.getElementById('zy')
+							that.selected.style.backgroundColor = "grey";
+							var opt = myChart.getOption();
+							that.show_part(myChart, opt);
 						})
 					},
 					cw() {
@@ -220,7 +197,14 @@
 						var myChart = echarts.init(document.getElementById('main'));
 						$.get('data/confirm_per_10000_echart.json', (json) => {
 							that.option.series[0].data = json;
-							myChart.setOption(that.option)
+							that.option.title.text = "确诊/万武汉迁入";
+							if (that.selected != "") {
+								that.selected.style.backgroundColor = "black";
+							}
+							that.selected = document.getElementById('cw')
+							that.selected.style.backgroundColor = "grey";
+							var opt = myChart.getOption();
+							that.show_part(myChart, opt);
 						})
 					},
 					yy() {
@@ -228,24 +212,70 @@
 						var myChart = echarts.init(document.getElementById('main'));
 						$.get('data/hospital_echart.json', (json) => {
 							that.option.series[0].data = json;
-							myChart.setOption(that.option)
+							that.option.title.text = "医院数量";
+							if (that.selected != "") {
+								that.selected.style.backgroundColor = "black";
+							}
+							that.selected = document.getElementById('yy')
+							that.selected.style.backgroundColor = "grey";
+							var opt = myChart.getOption();
+							that.show_part(myChart, opt);
 						})
+					},
+					show_part(myChart, opt) {
+						var show = Math.floor(Math.exp(opt.geo[0].zoom)-1)
+						if (show < this.option.series[0].data.length) {
+							var top10 = this.option.series[0].data.sort(function(a, b) {
+								return b.value[2] - a.value[2];
+							}).slice(0, show);
+							opt.series[0].data = top10;
+							myChart.setOption(opt);
+						} else {
+							// console.log(that.option)
+							this.option.geo.zoom = opt.geo[0].zoom;
+							myChart.setOption(this.option);
+						}
 					}
 				},
+				// watch: {
+				// 	'myChart.getOption().geo[0].zoom': function(val) {
+				// 		console.log(val)
+				// 	},
+				// 	// {
+				// 	// 	if (option.geo.zoom < 3) {
+				// 	// 		option.series[0].data = option.series[0].data.sort(function(a, b) {
+				// 	// 			return b.value[2] - a.value[2];
+				// 	// 		}).slice(0, 9)
+				// 	// 	}
+				// 	// },
+				// 	imediatte: true
+				// },
 				mounted() {
 					// 基于准备好的dom，初始化echarts实例
 					var myChart = echarts.init(document.getElementById('main'));
+					myChart.setOption(this.option);
 					var that = this;
 					$.get('data/cases_echart.json', (json) => {
 						that.option.series[0].data = json;
-						myChart.setOption(that.option)
-					})
+						that.option.title.text = "确诊病例";
+						if (that.selected != "") {
+							that.selected.style.backgroundColor = "black";
+						}
+						that.selected = document.getElementById('bl')
+						that.selected.style.backgroundColor = "grey";
+						var opt = myChart.getOption();
+						that.show_part(myChart, opt)
+					});
 					$.get('data/moves_echart.json', (json) => {
 						that.option.series[1].data = json;
-						myChart.setOption(that.option)
+						// console.log(myChart.getOption())
+					});
+					myChart.on('georoam', function(params) {
+						var opt = myChart.getOption();
+						// console.log(opt.geo[0].zoom);
+						that.show_part(myChart, opt)
 					})
 					// // 使用刚指定的配置项和数据显示图表。
-					// myChart.setOption(this.option);
 				}
 			})
 		</script>

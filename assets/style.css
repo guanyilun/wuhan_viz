@@ -1,0 +1,70 @@
+.changedata {
+	z-index: 999;
+	height: 40px;
+	width: 120px;
+	position: absolute;
+	border-radius: 5px;
+	text-align: center;
+	line-height: 40px;
+	background-color: black;
+	color: whitesmoke;
+	cursor: pointer;
+	font-size: 12px;
+}
+
+.change_1 {
+	left: 25px;
+	top: 60px;
+}
+
+.change_2 {
+	left: 25px;
+	top: 120px;
+}
+
+.change_3 {
+	left: 25px;
+	top: 180px;
+}
+
+.change_4 {
+	left: 25px;
+	top: 240px;
+}
+
+.change_5 {
+	left: 25px;
+	top: 300px;
+}
+
+.git_link {
+	bottom: 60px;
+	display: flex;
+	background-color: dimgray;
+	justify-content: center;
+	align-items: center;
+	text-align: center;
+	width: 90px;
+	height: 30px;
+	left: 40px;
+}
+
+.git_link img {
+	align-items: center;
+}
+
+.live {
+	top: 60px;
+	right: 20px;
+	display: flex;
+	background-color: rgba(0, 0, 0, 0);
+	justify-content: center;
+	align-items: center;
+	text-align: center;
+	width: 120px;
+	height: 30px;
+}
+
+.live img {
+	align-items: center;
+}
