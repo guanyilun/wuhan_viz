@@ -19,6 +19,7 @@
             <div class="changedata change_5" id="yy" v-on:click="yy">医院数量</div>
             <div class="changedata change_6" id="bed" v-on:click="bed">病床数量</div>
             <div class="changedata change_7" id="gdp" v-on:click="gdp">人均GDP</div>
+            <div class="changedata change_8" id="rate" v-on:click="rate">确诊日增率</div>
             <div class="changedata live"><img src="assets/live.png" style="height: 12px;width: 12px;">&nbsp;&nbsp;Live / 10分钟</div>
             <div class="changedata git_link" onclick="window.open('https://github.com/guanyilun/wuhan_viz')"><img src="assets/git.png"
                  style="height: 18px;width: 18px;">&nbsp;Github</div>
@@ -260,7 +261,19 @@
                             that.selected.style.backgroundColor = "grey";
                             that.show_part();
                         })
-
+                    },
+                    rate() {
+                        var that = this;
+                        $.get('data/rate_echart.json', (json) => {
+                            that.option.series[0].data = json;
+                            that.option.title.text = "确诊日增率";
+                            if (that.selected != "") {
+                                that.selected.style.backgroundColor = "black";
+                            }
+                            that.selected = document.getElementById('rate')
+                            that.selected.style.backgroundColor = "grey";
+                            that.show_part();
+                        })
                     },
                     show_part() {
                         var opt = this.chart.getOption()
