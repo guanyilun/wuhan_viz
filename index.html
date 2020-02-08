@@ -3,8 +3,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
         <title>武汉疫情可视化</title>
-        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-        <!-- 引入 echarts.js -->
+        <script src="https://cdn.jsdelivr.net/npm/vue"></script>
         <script src="js/echarts.min.js"></script>
         <script src="js/jquery.min.js"></script>
         <script src="js/china.js"></script>
@@ -21,7 +20,6 @@
             <div class="changedata live"><img src="assets/live.png" style="height: 12px;width: 12px;">&nbsp;&nbsp;Live / 10分钟</div>
             <div class="changedata git_link" onclick="window.open('https://github.com/guanyilun/wuhan_viz')"><img src="assets/git.png"
                  style="height: 18px;width: 18px;">&nbsp;Github</div>
-            <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
             <div id="main" style="width: 100%;height:100%;">
             </div>
         </div>
@@ -39,8 +37,8 @@
 
             var vm = new Vue({
                 el: '#app',
+                chart: null,
                 data: {
-                    chart: null,
                     selected: "",
                     option: {
                         backgroundColor: '#404a59',
@@ -58,10 +56,29 @@
                                     return params.data.name + ": " + params.data.value[2];
                                 } else if (params.seriesType == "lines") {
                                     return params.data.fromName + " -> " + params.data.toName + ": " + params.data.value;
+                                } else if (params.seriesType == "map") {
+                                    return params.data.name + ": " + params.data.value;
                                 } else {
                                     return params.name;
                                 }
                             }
+                        },
+                        visualMap: {
+                            left: 'right',
+                            bottom: '5%',
+                            type: 'piecewise',
+                            pieces: [
+                                {gt: 10000},
+                                {gt: 1000, lte: 10000},
+                                {gt: 500, lte: 999},   // (200, 300]
+                                {gt: 100, lte: 499},       // (10, 200]
+                                {gt: 10, lte: 99},
+                                {gt: 1, lte: 9}
+                            ],
+                            inRange: {
+                                color: ['#fcebcf', '#f59e83', '#e6594f', '#cb2a2f', '#811c24', '#4f060d'],
+                            },
+                            seriesIndex: [2],
                         },
                         legend: {
                             show: false,
@@ -75,7 +92,7 @@
                         },
                         geo: {
                             map: 'china',
-                            zoom: 1.2,
+                            zoom: 2,
                             label: {
                                 emphasis: {
                                     show: false
@@ -88,9 +105,9 @@
                                     borderColor: '#404a59'
                                 },
                                 emphasis: {
-                                    areaColor: '#2a333d'
+                                    areaColor: '#4f060d'
                                 }
-                            }
+                            },
                         },
                         series: [{
                             name: '地点',
@@ -111,7 +128,7 @@
                             showEffectOn: 'render',
                             itemStyle: {
                                 normal: {
-                                    color: '#46bee9',
+                                    color: '#fcebcf',
                                     opacity: 0.7
                                 }
                             },
@@ -144,6 +161,16 @@
                                 }
                             },
                             data: []
+                        },  {
+                            name: 'Estimates',
+                            type: 'map',
+                            emphasis: {
+                                label: {
+                                    show: true
+                                }
+                            },
+                            data: [],
+                            geoIndex: 0,
                         }],
                     }
                 },
@@ -210,7 +237,6 @@
                             }
                             that.selected = document.getElementById('yy')
                             that.selected.style.backgroundColor = "grey";
-                            var opt = myChart.getOption();
                             that.show_part();
                         })
                     },
@@ -231,7 +257,6 @@
                     }
                 },
                 mounted() {
-                    // 基于准备好的dom，初始化echarts实例
                     this.chart = echarts.init(document.getElementById('main'));
                     this.chart.setOption(this.option);
                     var that = this;
@@ -247,7 +272,12 @@
                     });
                     $.get('data/moves_echart.json', (json) => {
                         that.option.series[1].data = json;
+                        that.chart.setOption(that.option);
                     });
+                    $.get('data/prov_cases.json', (json) => {
+                        that.option.series[2].data = json;
+                        that.chart.setOption(that.option);
+                    })
                     this.chart.on('georoam', function(params) {
                         that.show_part()
                     })
