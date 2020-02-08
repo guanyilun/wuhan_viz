@@ -17,6 +17,8 @@
             <div class="changedata change_3" id="zy" v-on:click="zy">治愈率</div>
             <div class="changedata change_4" id="cw" v-on:click="cw">确诊/万武汉迁入</div>
             <div class="changedata change_5" id="yy" v-on:click="yy">医院数量</div>
+            <div class="changedata change_6" id="bed" v-on:click="bed">病床数量</div>
+            <div class="changedata change_7" id="gdp" v-on:click="gdp">人均GDP</div>
             <div class="changedata live"><img src="assets/live.png" style="height: 12px;width: 12px;">&nbsp;&nbsp;Live / 10分钟</div>
             <div class="changedata git_link" onclick="window.open('https://github.com/guanyilun/wuhan_viz')"><img src="assets/git.png"
                  style="height: 18px;width: 18px;">&nbsp;Github</div>
@@ -44,7 +46,9 @@
                         backgroundColor: '#404a59',
                         title: {
                             text: '',
+                            subtext: '数据每十分钟更新一次 | 缩放看更多城市数据',
                             left: 'center',
+                            top: '2%',
                             textStyle: {
                                 color: '#fff'
                             }
@@ -57,7 +61,7 @@
                                 } else if (params.seriesType == "lines") {
                                     return params.data.fromName + " -> " + params.data.toName + ": " + params.data.value;
                                 } else if (params.seriesType == "map") {
-                                    return params.data.name + ": " + params.data.value;
+                                    return params.data.name + " 确诊人数:" + params.data.value;
                                 } else {
                                     return params.name;
                                 }
@@ -70,25 +74,16 @@
                             pieces: [
                                 {gt: 10000},
                                 {gt: 1000, lte: 10000},
-                                {gt: 500, lte: 999},   // (200, 300]
-                                {gt: 100, lte: 499},       // (10, 200]
+                                {gt: 500, lte: 999},
+                                {gt: 100, lte: 499},
                                 {gt: 10, lte: 99},
-                                {gt: 1, lte: 9}
+                                {gte: 1, lte: 9}
                             ],
                             inRange: {
+                                // consistent color scale with DXY
                                 color: ['#fcebcf', '#f59e83', '#e6594f', '#cb2a2f', '#811c24', '#4f060d'],
                             },
                             seriesIndex: [2],
-                        },
-                        legend: {
-                            show: false,
-                            orient: 'vertical',
-                            top: 'bottom',
-                            left: 'right',
-                            data: ['地点', '线路'],
-                            textStyle: {
-                                color: '#fff'
-                            }
                         },
                         geo: {
                             map: 'china',
@@ -240,6 +235,33 @@
                             that.show_part();
                         })
                     },
+                    bed() {
+                        var that = this;
+                        $.get('data/bed_echart.json', (json) => {
+                            that.option.series[0].data = json;
+                            that.option.title.text = "病床数量";
+                            if (that.selected != "") {
+                                that.selected.style.backgroundColor = "black";
+                            }
+                            that.selected = document.getElementById('bed')
+                            that.selected.style.backgroundColor = "grey";
+                            that.show_part();
+                        })
+                    },
+                    gdp() {
+                        var that = this;
+                        $.get('data/gdp_echart.json', (json) => {
+                            that.option.series[0].data = json;
+                            that.option.title.text = "人均GDP";
+                            if (that.selected != "") {
+                                that.selected.style.backgroundColor = "black";
+                            }
+                            that.selected = document.getElementById('gdp')
+                            that.selected.style.backgroundColor = "grey";
+                            that.show_part();
+                        })
+
+                    },
                     show_part() {
                         var opt = this.chart.getOption()
                         var show = Math.floor(Math.exp(opt.geo[0].zoom)-1)
@@ -279,9 +301,8 @@
                         that.chart.setOption(that.option);
                     })
                     this.chart.on('georoam', function(params) {
-                        that.show_part()
+                        that.show_part();
                     })
-                    // // 使用刚指定的配置项和数据显示图表。
                 }
             })
         </script>
