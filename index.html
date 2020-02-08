@@ -229,6 +229,9 @@
 								return b.value[2] - a.value[2];
 							}).slice(0, show);
 							opt.series[0].data = top10;
+							// console.log("opt0:",opt)
+							opt.title[0].text = this.option.title.text;
+							// console.log("opt1:",opt)
 							myChart.setOption(opt);
 						} else {
 							// console.log(that.option)
