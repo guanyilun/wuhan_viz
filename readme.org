@@ -2,11 +2,15 @@
 - 网站: [[http://ncov.firslov.cn/]] 
 - 实时数据 / 每十分钟更新一次
 - 放大可看到各城市数据
-- 支持快捷键1-8切换数据
+- 支持数字键1-8切换数据
 - 欢迎提出改进意见和提供/修正数据源
-
 [[https://raw.githubusercontent.com/guanyilun/wuhan_viz/master/assets/screenshot.png]]
 [[https://raw.githubusercontent.com/guanyilun/wuhan_viz/master/assets/screenshot_2.png]]
+
+** 推荐玩法
+- 数字键1,8切换寻找确诊人数多且日增率高的城市
+- 数字键1,2,8切换寻找确诊人数多,人数增长快且死亡率高的城市
+- 数字键4,8寻找同样武汉迁入人口数量但是病例多且增速快的城市
 
 ** 数据来源
 - 迁移人口数据来源于百度迁徙, 武汉1月1日至1月26日总迁出人口比例
@@ -17,7 +21,18 @@
 - 医院数量为市辖区内医院数量,数据来源于2017中国城市统计年鉴
 - 病床数量为市辖区内病床总数量,数据来源同上
 - 人均GDP数据来自维基百科
-- 日增率: (当日确诊人数 - 前一日确诊人数) / 前一日确诊人数
+- 日增率: (当日确诊人数 - 三日前确诊人数) / 三日前确诊人数 / 3
+
+** 本地运行
+- 项目页面全部为静态页面,可以放在任意的静态服务器下,例如node-static,
+
+#+BEGIN_SRC bash
+sudo npm install -g node-static
+static .
+#+END_SRC
+网站会默认出现在 [[http://localhost:8080]]. 
+
+注意:本地版本中数据不会自动更新,更新数据可以通过按格式替换data文件夹中的相应json文件实现.如有问题或者特殊需求欢迎提交issue.
 
 ** 鸣谢
 感谢[[https://github.com/wuhan2020/wuhan2020][wuhan2020]]团队的支持
