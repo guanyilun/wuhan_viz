@@ -1,5 +1,9 @@
 * 武汉数据可视化
-网站: [[http://ncov.firslov.cn/]] (数据每十分钟更新一次)
+- 网站: [[http://ncov.firslov.cn/]] 
+- 实时数据 / 每十分钟更新一次
+- 放大可看到各城市数据
+- 支持快捷键1-8切换数据
+- 欢迎提出改进意见和提供/修正数据源
 
 [[https://raw.githubusercontent.com/guanyilun/wuhan_viz/master/assets/screenshot.png]]
 [[https://raw.githubusercontent.com/guanyilun/wuhan_viz/master/assets/screenshot_2.png]]
@@ -13,6 +17,7 @@
 - 医院数量为市辖区内医院数量,数据来源于2017中国城市统计年鉴
 - 病床数量为市辖区内病床总数量,数据来源同上
 - 人均GDP数据来自维基百科
+- 日增率: (当日确诊人数 - 前一日确诊人数) / 前一日确诊人数
 
 ** 鸣谢
 感谢[[https://github.com/wuhan2020/wuhan2020][wuhan2020]]团队的支持
