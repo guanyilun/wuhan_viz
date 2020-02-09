@@ -278,9 +278,10 @@
                     show_part() {
                         var opt = this.chart.getOption()
                         var show = Math.floor(Math.exp(opt.geo[0].zoom)-1)
-												console.log(opt.geo[0].zoom)
+												// console.log(opt.geo[0].zoom)
                         if (opt.geo[0].zoom < 3) {
                             opt.series[0].data = [];
+														opt.series[1].data = [];
                             opt.title[0].text = this.option.title.text;
                             this.chart.setOption(opt);
                         } else {
@@ -304,7 +305,6 @@
                     });
                     $.get('data/moves_echart.json', (json) => {
                         that.option.series[1].data = json;
-                        that.chart.setOption(that.option);
                     });
                     $.get('data/prov_cases.json', (json) => {
                         that.option.series[2].data = json;
