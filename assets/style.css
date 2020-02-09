@@ -1,7 +1,7 @@
 .changedata {
 	z-index: 999;
 	height: 40px;
-	width: 100px;
+	width: 90px;
 	position: absolute;
 	border-radius: 5px;
 	text-align: center;
@@ -14,52 +14,52 @@
 
 .change_1 {
 	left: 20px;
-	top: 40px;
+	top: 80px;
 }
 
 .change_2 {
 	left: 20px;
-	top: 100px;
+	top: 140px;
 }
 
 .change_3 {
 	left: 20px;
-	top: 160px;
+	top: 200px;
 }
 
 .change_4 {
 	left: 20px;
-	top: 220px;
+	top: 260px;
 }
 
 .change_5 {
 	left: 20px;
-	top: 280px;
+	top: 320px;
 }
 
 .change_6 {
     left: 20px;
-    top: 340px;
+    top: 380px;
 }
 
 .change_7 {
     left: 20px;
-    top: 400px;
+    top: 440px;
 }
 
 .change_8 {
     left: 20px;
-    top: 460px;
+    top: 500px;
 }
 
 .git_link {
-	bottom: 40px;
+	bottom: 30px;
 	display: flex;
 	background-color: dimgray;
 	justify-content: center;
 	align-items: center;
 	text-align: center;
-	width: 90px;
+	width: 60px;
 	height: 30px;
 	left: 35px;
 }
@@ -69,14 +69,14 @@
 }
 
 .live {
-	top: 60px;
-	right: 20px;
+	top: 70px;
+	right: 10px;
 	display: flex;
 	background-color: rgba(0, 0, 0, 0);
 	justify-content: center;
 	align-items: center;
 	text-align: center;
-	width: 120px;
+	width: 80px;
 	height: 30px;
 }
 

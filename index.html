@@ -20,7 +20,7 @@
             <div class="changedata change_6" id="bed" v-on:click="bed">病床数量</div>
             <div class="changedata change_7" id="gdp" v-on:click="gdp">人均GDP</div>
             <div class="changedata change_8" id="rate" v-on:click="rate">确诊日增率</div>
-            <div class="changedata live"><img src="assets/live.png" style="height: 12px;width: 12px;">&nbsp;&nbsp;Live / 10分钟</div>
+            <div class="changedata live"><img src="assets/live.png" style="height: 12px;width: 12px;">&nbsp;&nbsp;Live</div>
             <div class="changedata git_link" onclick="window.open('https://github.com/guanyilun/wuhan_viz')"><img src="assets/git.png"
                  style="height: 18px;width: 18px;">&nbsp;Github</div>
             <div id="main" style="width: 100%;height:100%;">
@@ -278,11 +278,9 @@
                     show_part() {
                         var opt = this.chart.getOption()
                         var show = Math.floor(Math.exp(opt.geo[0].zoom)-1)
-                        if (show < this.option.series[0].data.length) {
-                            var top10 = this.option.series[0].data.sort(function(a, b) {
-                                return b.value[2] - a.value[2];
-                            }).slice(0, show);
-                            opt.series[0].data = top10;
+												console.log(opt.geo[0].zoom)
+                        if (opt.geo[0].zoom < 3) {
+                            opt.series[0].data = [];
                             opt.title[0].text = this.option.title.text;
                             this.chart.setOption(opt);
                         } else {
@@ -303,7 +301,6 @@
                         }
                         that.selected = document.getElementById('bl')
                         that.selected.style.backgroundColor = "grey";
-                        that.show_part()
                     });
                     $.get('data/moves_echart.json', (json) => {
                         that.option.series[1].data = json;
@@ -312,6 +309,7 @@
                     $.get('data/prov_cases.json', (json) => {
                         that.option.series[2].data = json;
                         that.chart.setOption(that.option);
+												that.show_part()
                     })
                     this.chart.on('georoam', function(params) {
                         that.show_part();
