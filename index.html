@@ -1,322 +1,357 @@
 <html>
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
-        <title>武汉疫情可视化</title>
-        <script src="https://cdn.jsdelivr.net/npm/vue"></script>
-        <script src="js/echarts.min.js"></script>
-        <script src="js/jquery.min.js"></script>
-        <script src="js/china.js"></script>
-        <link rel="icon" href="assets/favicon.ico">
-        <link rel="stylesheet" type="text/css" href="assets/style.css">
-    </head>
-    <body style="margin: 0px;">
-        <div id="app" style="width: 100%;height:100%;">
-            <div class="changedata change_1" id="bl" v-on:click="bl">确诊病例</div>
-            <div class="changedata change_2" id="zs" v-on:click="zs">致死率</div>
-            <div class="changedata change_3" id="zy" v-on:click="zy">治愈率</div>
-            <div class="changedata change_4" id="cw" v-on:click="cw">确诊/万武汉迁入</div>
-            <div class="changedata change_5" id="yy" v-on:click="yy">医院数量</div>
-            <div class="changedata change_6" id="bed" v-on:click="bed">病床数量</div>
-            <div class="changedata change_7" id="gdp" v-on:click="gdp">人均GDP</div>
-            <div class="changedata change_8" id="rate" v-on:click="rate">确诊日增率</div>
-            <div class="changedata live"><img src="assets/live.png" style="height: 12px;width: 12px;">&nbsp;&nbsp;Live</div>
-            <div class="changedata git_link" onclick="window.open('https://github.com/guanyilun/wuhan_viz')"><img src="assets/git.png"
-                 style="height: 18px;width: 18px;">&nbsp;Github</div>
-            <div id="main" style="width: 100%;height:100%;">
-            </div>
-        </div>
-        <script type="text/javascript">
-            window.onload = function() {
-                document.addEventListener('touchstart', function(event) {
-                    if (event.touches.length > 1) {
-                        event.preventDefault()
-                    }
-                })
-                document.addEventListener('gesturestart', function(event) {
-                    event.preventDefault()
-                })
-            }
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+		<title>武汉疫情可视化</title>
+		<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+		<script src="js/echarts.min.js"></script>
+		<script src="js/jquery.min.js"></script>
+		<script src="js/china.js"></script>
+		<link rel="icon" href="assets/favicon.ico">
+		<link rel="stylesheet" type="text/css" href="assets/style.css">
+	</head>
+	<body style="margin: 0px;">
+		<div id="app" style="width: 100%;height:100%;">
+			<div class="changedata change_1" id="bl" v-on:click="bl">确诊病例</div>
+			<div class="changedata change_2" id="zs" v-on:click="zs">致死率</div>
+			<div class="changedata change_3" id="zy" v-on:click="zy">治愈率</div>
+			<div class="changedata change_4" id="cw" v-on:click="cw">确诊/万武汉迁入</div>
+			<div class="changedata change_5" id="yy" v-on:click="yy">医院数量</div>
+			<div class="changedata change_6" id="bed" v-on:click="bed">病床数量</div>
+			<div class="changedata change_7" id="gdp" v-on:click="gdp">人均GDP</div>
+			<div class="changedata change_8" id="rate" v-on:click="rate">确诊日增率</div>
+			<div class="changedata live"><img src="assets/live.png" style="height: 12px;width: 12px;">&nbsp;&nbsp;Live</div>
+			<div class="changedata git_link" onclick="window.open('https://github.com/guanyilun/wuhan_viz')"><img src="assets/git.png"
+				 style="height: 18px;width: 18px;">&nbsp;Github</div>
+			<div id="main" style="width: 100%;height:100%;">
+			</div>
+		</div>
+		<script type="text/javascript">
+			window.onload = function() {
+				document.addEventListener('touchstart', function(event) {
+					if (event.touches.length > 1) {
+						event.preventDefault()
+					}
+				})
+				document.addEventListener('gesturestart', function(event) {
+					event.preventDefault()
+				})
+			}
 
-            var vm = new Vue({
-                el: '#app',
-                chart: null,
-                data: {
-                    selected: "",
-                    option: {
-                        backgroundColor: '#404a59',
-                        title: {
-                            text: '',
-                            subtext: '数据每十分钟更新一次 | 缩放看更多城市数据',
-                            left: 'center',
-                            top: '2%',
-                            textStyle: {
-                                color: '#fff'
-                            }
-                        },
-                        tooltip: {
-                            trigger: 'item',
-                            formatter: function(params, ticket, callback) {
-                                if (params.seriesType == "effectScatter") {
-                                    return params.data.name + ": " + params.data.value[2];
-                                } else if (params.seriesType == "lines") {
-                                    return params.data.fromName + " -> " + params.data.toName + ": " + params.data.value;
-                                } else if (params.seriesType == "map") {
-                                    return params.data.name + " 确诊人数:" + params.data.value;
-                                } else {
-                                    return params.name;
-                                }
-                            }
-                        },
-                        visualMap: {
-                            left: 'right',
-                            bottom: '5%',
-                            type: 'piecewise',
-                            pieces: [
-                                {gt: 10000},
-                                {gt: 1000, lte: 10000},
-                                {gt: 500, lte: 999},
-                                {gt: 100, lte: 499},
-                                {gt: 10, lte: 99},
-                                {gte: 1, lte: 9}
-                            ],
-                            inRange: {
-                                // consistent color scale with DXY
-                                color: ['#fcebcf', '#f59e83', '#e6594f', '#cb2a2f', '#811c24', '#4f060d'],
-                            },
-                            seriesIndex: [2],
-                        },
-                        geo: {
-                            map: 'china',
-                            zoom: 2,
-                            label: {
-                                emphasis: {
-                                    show: false
-                                }
-                            },
-                            roam: true,
-                            itemStyle: {
-                                normal: {
-                                    areaColor: '#323c48',
-                                    borderColor: '#404a59'
-                                },
-                                emphasis: {
-                                    areaColor: '#4f060d'
-                                }
-                            },
-                        },
-                        series: [{
-                            name: '地点',
-                            type: 'effectScatter',
-                            coordinateSystem: 'geo',
-                            zlevel: 2,
-                            rippleEffect: {
-                                brushType: 'stroke'
-                            },
-                            label: {
-                                normal: {
-                                    show: true,
-                                    position: 'right',
-                                    formatter: '{b}'
-                                },
-                            },
-                            symbolSize: 2,
-                            showEffectOn: 'render',
-                            itemStyle: {
-                                normal: {
-                                    color: '#fcebcf',
-                                    opacity: 0.7
-                                }
-                            },
-                            data: []
-                        }, {
-                            name: '线路',
-                            type: 'lines',
-                            coordinateSystem: 'geo',
-                            zlevel: 2,
-                            large: true,
-                            effect: {
-                                show: true,
-                                constantSpeed: 30,
-                                symbol: 'pin',
-                                symbolSize: 3,
-                                trailLength: 0,
-                            },
-                            lineStyle: {
-                                normal: {
-                                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
-                                        offset: 0,
-                                        color: '#58B3CC'
-                                    }, {
-                                        offset: 1,
-                                        color: '#F58158'
-                                    }], false),
-                                    width: 1,
-                                    opacity: 0.2,
-                                    curveness: 0.1
-                                }
-                            },
-                            data: []
-                        },  {
-                            name: 'Estimates',
-                            type: 'map',
-                            emphasis: {
-                                label: {
-                                    show: true
-                                }
-                            },
-                            data: [],
-                            geoIndex: 0,
-                        }],
-                    }
-                },
-                methods: {
-                    bl() {
-                        var that = this;
-                        $.get('data/cases_echart.json', (json) => {
-                            that.option.series[0].data = json;
-                            that.option.title.text = "确诊病例";
-                            if (that.selected != "") {
-                                that.selected.style.backgroundColor = "black";
-                            }
-                            that.selected = document.getElementById('bl')
-                            that.selected.style.backgroundColor = "grey";
-                            that.show_part();
-                        })
-                    },
-                    zs() {
-                        var that = this;
-                        $.get('data/fatality_echart.json', (json) => {
-                            that.option.series[0].data = json;
-                            that.option.title.text = "致死率";
-                            if (that.selected != "") {
-                                that.selected.style.backgroundColor = "black";
-                            }
-                            that.selected = document.getElementById('zs')
-                            that.selected.style.backgroundColor = "grey";
-                            that.show_part();
-                        })
-                    },
-                    zy() {
-                        var that = this;
-                        $.get('data/cure_echart.json', (json) => {
-                            that.option.series[0].data = json;
-                            that.option.title.text = "治愈率";
-                            if (that.selected != "") {
-                                that.selected.style.backgroundColor = "black";
-                            }
-                            that.selected = document.getElementById('zy')
-                            that.selected.style.backgroundColor = "grey";
-                            that.show_part();
-                        })
-                    },
-                    cw() {
-                        var that = this;
-                        $.get('data/confirm_per_10000_echart.json', (json) => {
-                            that.option.series[0].data = json;
-                            that.option.title.text = "确诊/万武汉迁入";
-                            if (that.selected != "") {
-                                that.selected.style.backgroundColor = "black";
-                            }
-                            that.selected = document.getElementById('cw')
-                            that.selected.style.backgroundColor = "grey";
-                            that.show_part();
-                        })
-                    },
-                    yy() {
-                        var that = this;
-                        $.get('data/hospital_echart.json', (json) => {
-                            that.option.series[0].data = json;
-                            that.option.title.text = "医院数量";
-                            if (that.selected != "") {
-                                that.selected.style.backgroundColor = "black";
-                            }
-                            that.selected = document.getElementById('yy')
-                            that.selected.style.backgroundColor = "grey";
-                            that.show_part();
-                        })
-                    },
-                    bed() {
-                        var that = this;
-                        $.get('data/bed_echart.json', (json) => {
-                            that.option.series[0].data = json;
-                            that.option.title.text = "病床数量";
-                            if (that.selected != "") {
-                                that.selected.style.backgroundColor = "black";
-                            }
-                            that.selected = document.getElementById('bed')
-                            that.selected.style.backgroundColor = "grey";
-                            that.show_part();
-                        })
-                    },
-                    gdp() {
-                        var that = this;
-                        $.get('data/gdp_echart.json', (json) => {
-                            that.option.series[0].data = json;
-                            that.option.title.text = "人均GDP";
-                            if (that.selected != "") {
-                                that.selected.style.backgroundColor = "black";
-                            }
-                            that.selected = document.getElementById('gdp')
-                            that.selected.style.backgroundColor = "grey";
-                            that.show_part();
-                        })
-                    },
-                    rate() {
-                        var that = this;
-                        $.get('data/rate_echart.json', (json) => {
-                            that.option.series[0].data = json;
-                            that.option.title.text = "确诊日增率";
-                            if (that.selected != "") {
-                                that.selected.style.backgroundColor = "black";
-                            }
-                            that.selected = document.getElementById('rate')
-                            that.selected.style.backgroundColor = "grey";
-                            that.show_part();
-                        })
-                    },
-                    show_part() {
-                        var opt = this.chart.getOption()
-                        var show = Math.floor(Math.exp(opt.geo[0].zoom)-1)
-												// console.log(opt.geo[0].zoom)
-                        if (opt.geo[0].zoom < 3) {
-                            opt.series[0].data = [];
-														opt.series[1].data = [];
-                            opt.title[0].text = this.option.title.text;
-                            this.chart.setOption(opt);
-                        } else {
-                            this.option.geo.zoom = opt.geo[0].zoom;
-                            this.chart.setOption(this.option);
-                        }
-                    }
-                },
-                mounted() {
-                    this.chart = echarts.init(document.getElementById('main'));
-                    this.chart.setOption(this.option);
-                    var that = this;
-                    $.get('data/cases_echart.json', (json) => {
-                        that.option.series[0].data = json;
-                        that.option.title.text = "确诊病例";
-                        if (that.selected != "") {
-                            that.selected.style.backgroundColor = "black";
-                        }
-                        that.selected = document.getElementById('bl')
-                        that.selected.style.backgroundColor = "grey";
-                    });
-                    $.get('data/moves_echart.json', (json) => {
-                        that.option.series[1].data = json;
-                    });
-                    $.get('data/prov_cases.json', (json) => {
-                        that.option.series[2].data = json;
-                        that.chart.setOption(that.option);
-												that.show_part()
-                    })
-                    this.chart.on('georoam', function(params) {
-                        that.show_part();
-                    })
-                }
-            })
-        </script>
-        <script type="text/javascript" src="http://tajs.qq.com/stats?sId=66514846" charset="UTF-8"></script>
-    </body>
+			var vm = new Vue({
+				el: '#app',
+				chart: null,
+				data: {
+					selected: "",
+					option: {
+						backgroundColor: '#404a59',
+						title: {
+							text: '',
+							subtext: '数据每十分钟更新一次 | 缩放看更多城市数据',
+							left: 'center',
+							top: '2%',
+							textStyle: {
+								color: '#fff'
+							}
+						},
+						tooltip: {
+							trigger: 'item',
+							formatter: function(params, ticket, callback) {
+								if (params.seriesType == "effectScatter") {
+									return params.data.name + ": " + params.data.value[2];
+								} else if (params.seriesType == "lines") {
+									return params.data.fromName + " -> " + params.data.toName + ": " + params.data.value;
+								} else if (params.seriesType == "map") {
+									return params.data.name + " 确诊人数:" + params.data.value;
+								} else {
+									return params.name;
+								}
+							}
+						},
+						visualMap: {
+							left: 'right',
+							bottom: '5%',
+							type: 'piecewise',
+							pieces: [{
+									gt: 10000
+								},
+								{
+									gt: 1000,
+									lte: 10000
+								},
+								{
+									gt: 500,
+									lte: 999
+								},
+								{
+									gt: 100,
+									lte: 499
+								},
+								{
+									gt: 10,
+									lte: 99
+								},
+								{
+									gte: 1,
+									lte: 9
+								}
+							],
+							inRange: {
+								// consistent color scale with DXY
+								color: ['#fcebcf', '#f59e83', '#e6594f', '#cb2a2f', '#811c24', '#4f060d'],
+							},
+							seriesIndex: [2],
+						},
+						geo: {
+							map: 'china',
+							zoom: 2,
+							label: {
+								emphasis: {
+									show: false
+								}
+							},
+							roam: true,
+							itemStyle: {
+								normal: {
+									areaColor: '#323c48',
+									borderColor: '#404a59'
+								},
+								emphasis: {
+									areaColor: '#4f060d'
+								}
+							},
+						},
+						series: [{
+							name: '地点',
+							type: 'effectScatter',
+							coordinateSystem: 'geo',
+							zlevel: 2,
+							rippleEffect: {
+								brushType: 'stroke'
+							},
+							label: {
+								normal: {
+									show: true,
+									position: 'right',
+									formatter: '{b}'
+								},
+							},
+							symbolSize: 2,
+							showEffectOn: 'render',
+							itemStyle: {
+								normal: {
+									color: '#fcebcf',
+									opacity: 0.7
+								}
+							},
+							data: []
+						}, {
+							name: '线路',
+							type: 'lines',
+							coordinateSystem: 'geo',
+							zlevel: 2,
+							large: true,
+							effect: {
+								show: true,
+								constantSpeed: 30,
+								symbol: 'pin',
+								symbolSize: 3,
+								trailLength: 0,
+							},
+							lineStyle: {
+								normal: {
+									color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+										offset: 0,
+										color: '#58B3CC'
+									}, {
+										offset: 1,
+										color: '#F58158'
+									}], false),
+									width: 1,
+									opacity: 0.2,
+									curveness: 0.1
+								}
+							},
+							data: []
+						}, {
+							name: 'Estimates',
+							type: 'map',
+							emphasis: {
+								label: {
+									show: true
+								}
+							},
+							data: [],
+							geoIndex: 0,
+						}],
+					}
+				},
+				methods: {
+					bl() {
+						var that = this;
+						$.get('data/cases_echart.json', (json) => {
+							that.option.series[0].data = json;
+							that.option.title.text = "确诊病例";
+							if (that.selected != "") {
+								that.selected.style.backgroundColor = "black";
+							}
+							that.selected = document.getElementById('bl')
+							that.selected.style.backgroundColor = "grey";
+							that.show_part();
+						})
+					},
+					zs() {
+						var that = this;
+						$.get('data/fatality_echart.json', (json) => {
+							that.option.series[0].data = json;
+							that.option.title.text = "致死率";
+							if (that.selected != "") {
+								that.selected.style.backgroundColor = "black";
+							}
+							that.selected = document.getElementById('zs')
+							that.selected.style.backgroundColor = "grey";
+							that.show_part();
+						})
+					},
+					zy() {
+						var that = this;
+						$.get('data/cure_echart.json', (json) => {
+							that.option.series[0].data = json;
+							that.option.title.text = "治愈率";
+							if (that.selected != "") {
+								that.selected.style.backgroundColor = "black";
+							}
+							that.selected = document.getElementById('zy')
+							that.selected.style.backgroundColor = "grey";
+							that.show_part();
+						})
+					},
+					cw() {
+						var that = this;
+						$.get('data/confirm_per_10000_echart.json', (json) => {
+							that.option.series[0].data = json;
+							that.option.title.text = "确诊/万武汉迁入";
+							if (that.selected != "") {
+								that.selected.style.backgroundColor = "black";
+							}
+							that.selected = document.getElementById('cw')
+							that.selected.style.backgroundColor = "grey";
+							that.show_part();
+						})
+					},
+					yy() {
+						var that = this;
+						$.get('data/hospital_echart.json', (json) => {
+							that.option.series[0].data = json;
+							that.option.title.text = "医院数量";
+							if (that.selected != "") {
+								that.selected.style.backgroundColor = "black";
+							}
+							that.selected = document.getElementById('yy')
+							that.selected.style.backgroundColor = "grey";
+							that.show_part();
+						})
+					},
+					bed() {
+						var that = this;
+						$.get('data/bed_echart.json', (json) => {
+							that.option.series[0].data = json;
+							that.option.title.text = "病床数量";
+							if (that.selected != "") {
+								that.selected.style.backgroundColor = "black";
+							}
+							that.selected = document.getElementById('bed')
+							that.selected.style.backgroundColor = "grey";
+							that.show_part();
+						})
+					},
+					gdp() {
+						var that = this;
+						$.get('data/gdp_echart.json', (json) => {
+							that.option.series[0].data = json;
+							that.option.title.text = "人均GDP";
+							if (that.selected != "") {
+								that.selected.style.backgroundColor = "black";
+							}
+							that.selected = document.getElementById('gdp')
+							that.selected.style.backgroundColor = "grey";
+							that.show_part();
+						})
+					},
+					rate() {
+						var that = this;
+						$.get('data/rate_echart.json', (json) => {
+							that.option.series[0].data = json;
+							that.option.title.text = "确诊日增率";
+							if (that.selected != "") {
+								that.selected.style.backgroundColor = "black";
+							}
+							that.selected = document.getElementById('rate')
+							that.selected.style.backgroundColor = "grey";
+							that.show_part();
+						})
+					},
+					show_part() {
+						var opt = this.chart.getOption()
+						var show = Math.floor(Math.exp(opt.geo[0].zoom) - 1)
+						// console.log(opt.geo[0].zoom)
+						if (opt.geo[0].zoom < 3) {
+							opt.series[0].data = [];
+							opt.series[1].data = [];
+							opt.title[0].text = this.option.title.text;
+							this.chart.setOption(opt);
+						} else {
+							this.option.geo.zoom = opt.geo[0].zoom;
+							this.chart.setOption(this.option);
+						}
+					}
+				},
+				mounted() {
+					this.chart = echarts.init(document.getElementById('main'));
+					this.chart.setOption(this.option);
+					var that = this;
+					$.get('data/cases_echart.json', (json) => {
+						that.option.series[0].data = json;
+						that.option.title.text = "确诊病例";
+						if (that.selected != "") {
+							that.selected.style.backgroundColor = "black";
+						}
+						that.selected = document.getElementById('bl')
+						that.selected.style.backgroundColor = "grey";
+					});
+					$.get('data/moves_echart.json', (json) => {
+						that.option.series[1].data = json;
+					});
+					$.get('data/prov_cases.json', (json) => {
+						that.option.series[2].data = json;
+						that.chart.setOption(that.option);
+						that.show_part()
+					});
+					this.chart.on('georoam', function(params) {
+						that.show_part();
+					});
+					$(document).keydown(function(event) {
+						if (event.keyCode == 49) {
+							that.bl();
+						} else if (event.keyCode == 50) {
+							that.zs();
+						} else if (event.keyCode == 51) {
+							that.zy();
+						} else if (event.keyCode == 52) {
+							that.cw();
+						} else if (event.keyCode == 53) {
+							that.yy();
+						} else if (event.keyCode == 54) {
+							that.bed();
+						} else if (event.keyCode == 55) {
+							that.gdp();
+						} else if (event.keyCode == 56) {
+							that.rate();
+						}
+					});
+				}
+			})
+		</script>
+		<script type="text/javascript" src="http://tajs.qq.com/stats?sId=66514846" charset="UTF-8"></script>
+	</body>
 </html>
